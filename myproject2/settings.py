@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    'rest_framework_simplejwt.token_blacklist',
     "accounts",
     "social_accounts",
     "corsheaders",
@@ -156,3 +158,7 @@ DEFAULT_FROM_EMAIL = 'elmelegiymahmoud0@gmail.com'
 EMAIL_PORT = '2525'
 EMAIL_USE_TLS=True
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# add Gmail account
+GOOGLE_CLIENT_ID=env('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET=env('GOOGLE_CLIENT_SECRET')

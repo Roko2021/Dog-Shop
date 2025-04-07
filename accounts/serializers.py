@@ -8,6 +8,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import smart_str,smart_bytes, force_str
 from django.urls import reverse
 from .utils import send_normal_email
+from rest_framework_simplejwt.tokens import RefreshToken,Token
+from rest_framework_simplejwt.exceptions import TokenError
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=68,min_length=6, write_only=True)  # يتم مشاركة كلمة المرور فقط عند التسجيل
@@ -118,3 +120,19 @@ class SetNewPasswordSerializer(serializers.Serializer):
         
         except Exception as e:
             raise AuthenticationFailed('link is invalid or has expired')
+
+class LogoutUserSerializer(serializers.Serializer):
+    refresh_token=serializers.CharField(max_length=255,min_length=1,write_only=True)
+    default_error_messages={
+        'bad_token': 'Token is invalid or expired'
+    }
+    def validate(self, attrs):
+        self.token=attrs.get('refresh_token')
+        return attrs
+    def save(self, **kwargs):
+        try:
+            token=RefreshToken(self.token)
+            token.blacklist()
+            # return {'message':'Logged out successfully'}
+        except TokenError:
+            return self.fail('bad_token')
