@@ -14,6 +14,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 class RegisterUserView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
+    # def get(self, request, *args, **kwargs):
+        # return Response({"message": "Send POST request with username, email, and password."}, status=status.HTTP_200_OK)
+
+
     def post(self, request):
         user_data=request.data
         serializer = self.serializer_class(data=user_data)
