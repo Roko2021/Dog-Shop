@@ -4,6 +4,8 @@ import Profile from './profile';
 import ForgetPassword from './ForgetPassword';
 import VerifyEmail from './VerifyEmail';
 import ResetPassword  from './ResetPassword'; 
+import Main from './Main';
+import AddAnimls from './AddAnimls';
 
 
 
@@ -13,5 +15,7 @@ export {
     Profile,
     ForgetPassword,
     VerifyEmail,
-    ResetPassword
+    ResetPassword,
+    Main,
+    AddAnimls
 }

@@ -1,3 +1,30 @@
+
+// import axios from "axios";
+// import { jwtDecode } from "jwt-decode";
+// import dayjs from "dayjs";
+
+
+// const token = localStorage.getItem('access') ? JSON.parse(localStorage.getItme('access')) : "";
+// const refresh_token = localStorage.getItem('refresh') ? JSON.parse(localStorage.getItme('refresh')) : "";
+
+// const baseUrl = "http://localhost:8000/api/v1";
+
+// const axiosInstance = axios.create({
+//     baseURL: baseUrl,
+//     headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: localStorage.getItem('access') ? `Bearer ${localStorage.getItem('access')}` : null,
+//     },
+// });
+
+
+
+// export default axiosInstance;
+
+
+
+
+
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";

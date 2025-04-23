@@ -145,3 +145,12 @@ h3{
   color: #fff;
   border-radius: 5px;
 }
+
+.main{
+  display: block;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: space-around;
+  justify-content: space-between;
+  align-items: center;
+}

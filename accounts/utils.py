@@ -32,4 +32,4 @@ def send_normal_email(data):
         from_email=settings.EMAIL_HOST_USER,
         to=[data['to_email']]
     )
-    email.send()
+

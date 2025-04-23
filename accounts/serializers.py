@@ -144,3 +144,14 @@ class LogoutUserSerializer(serializers.Serializer):
             # return {'message':'Logged out successfully'}
         except TokenError:
             return self.fail('bad_token')
+
+
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'email']

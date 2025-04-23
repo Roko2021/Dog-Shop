@@ -83,6 +83,7 @@ WSGI_APPLICATION = "myproject2.wsgi.application"
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS=[
     "http://localhost:3000",
+    "http://localhost:8000",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
@@ -110,9 +111,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(seconds=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "AUTH_HEADER_TYPES": ("Bearer",),
+    'BLACKLIST_AFTER_ROTATION': True,  # تأكد من هذه القيمة
 }
 
 # Password validation
@@ -187,6 +189,15 @@ REST_FRAMEWORK = {
 
 
 
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # GITHUB_CLIENT_ID='Ov23libKLQO4Vlu13eJp'
 # GITHUB_CLIENT_SECRET = '15094fb207fde29a349d0277e081dd9b11df7d53'
 # GITHUB_REDIRECT_URI = 'http://localhost:5173/auth/github/'  # أو أي عنوان URL لإعادة التوجيه الذي استخدمته
+

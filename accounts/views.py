@@ -11,6 +11,9 @@ from django.utils.encoding import smart_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 # Create your views here.
 
+from .serializers import UserSerializer  # هنحتاج نكتبه حالًا
+
+
 class RegisterUserView(GenericAPIView):
     serializer_class = UserRegisterSerializer
 
@@ -65,14 +68,18 @@ class LoginUserVeiw(GenericAPIView):
         serializer=self.serializer_class(data=request.data, context={'request':request})
         serializer.is_valid(raise_exception=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     
 class TestAuthentiactionView(GenericAPIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        data={
-            'msg':'its works'
-        }
-        return Response(data, status=status.HTTP_200_OK)
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+        # data={
+        #     'msg':'its works'
+        # }
+        # return Response(data, status=status.HTTP_200_OK)
 
 class PasswordResetRequestView(GenericAPIView):
     serializer_class=PasswordResetRequestSerializer
@@ -109,7 +116,8 @@ class PasswordResetConfirm(GenericAPIView):
             return Response({
                    'message': 'token is invalid or has expired',
                 },status=status.HTTP_401_UNAUTHORIZED)
-        
+
+
 
 class SetNewPassword(GenericAPIView):
     serializer_class=SetNewPasswordSerializer
@@ -118,12 +126,76 @@ class SetNewPassword(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response({'message':'password reset successful'},status=status.HTTP_200_OK)
 
-class LogoutUserView(GenericAPIView):
-    serializer_class=LogoutUserSerializer
-    permission_classes=[IsAuthenticated]
+
+
+from rest_framework.views import APIView, Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+import logging
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.generics import GenericAPIView
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+class LogoutUserView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        serializer=self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_200_OK)
+        try:
+            # استلام الـ Refresh Token من البيانات
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # التحقق من صلاحية التوكن
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # وضع التوكن في القائمة السوداء
+
+            return Response({"detail": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
+
+        except Exception as e:
+            logger.exception(f"An error occurred during logout: {e}")
+            return Response({"detail": "Invalid or expired refresh token."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+# class LogoutUserView(GenericAPIView):
+#     serializer_class=LogoutUserSerializer
+#     premission_classes=[isAuthanticated]
+
+#     def post(self,request):
+#         serializer = self.serialzer_class(data=request.data)
+#         serializer.isvalid(raise_exception=True)
+#         serializer.save()
+#         return Response(status=status.HTTP_200_OK)
+
+
+# class LogoutUserView(GenericAPIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         try:
+#             # الحصول على الـ refresh_token من الـ Authorization header
+#             refresh_token = request.headers.get('Authorization')
+#             if refresh_token is None or not refresh_token.startswith('Bearer '):
+#                 return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+            
+#             refresh_token = refresh_token.split(' ')[1]  # استخراج التوكن بدون "Bearer "
+            
+#             # محاولة التحقق من refresh_token
+#             token = RefreshToken(refresh_token)
+#             token.blacklist()  # إضافة التوكن إلى القائمة السوداء
+
+#             return Response({"detail": "Successfully logged out."}, status=status.HTTP_204_NO_CONTENT)
+#         except Exception as e:
+#             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
