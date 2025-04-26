@@ -24,7 +24,7 @@ const Layout = () => {
             flexWrap: 'wrap'           // camelCase
             }}>
           <div>
-            <a href="/main" style={{ color: 'white', marginRight: '1rem' }}>Main</a>
+            <a href="/" style={{ color: 'white', marginRight: '1rem' }}>Main</a>
           </div>
           <div style={{
                 display: 'flex',

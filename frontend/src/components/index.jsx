@@ -6,6 +6,8 @@ import VerifyEmail from './VerifyEmail';
 import ResetPassword  from './ResetPassword'; 
 import Main from './Main';
 import AddAnimls from './AddAnimls';
+import AnimalDetails from './AnimalDetails';
+
 
 
 
@@ -17,5 +19,6 @@ export {
     VerifyEmail,
     ResetPassword,
     Main,
-    AddAnimls
+    AddAnimls,
+    AnimalDetails
 }

@@ -69,3 +69,10 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.add-to-cart{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}

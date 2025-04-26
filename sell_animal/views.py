@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from .serializers import AnimalsSerializer, CategorySerializer, BidSerializer, AnimalMainSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -62,3 +62,9 @@ class CategoryList(GenericAPIView):
         categories = Category.objects.all()
         category_serializer = CategorySerializer(categories, many=True)
         return Response(category_serializer.data)
+
+
+class AnimalDetail(RetrieveAPIView):
+    queryset = Animals.objects.all()
+    serializer_class = AnimalMainSerializer
+    lookup_field = 'id'  # استخدام الـ id كمعرف للبحث

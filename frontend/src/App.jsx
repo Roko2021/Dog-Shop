@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Signup, Login, Profile, VerifyEmail, ForgetPassword, ResetPassword
-    , Main, AddAnimls } from './components';
+    , Main, AddAnimls, AnimalDetails } from './components';
 import './App.css';
 import Layout from './utils/Layout'; // بدون curly braces {}
 
@@ -25,6 +25,8 @@ function App() {
                         <Route path='/forget_password' element={<ForgetPassword />} />
                         <Route path='/password-reset/confirm/:uid/:token' element={<ResetPassword />} />
                         <Route path='/AddAnimls' element={<AddAnimls />} />
+                        <Route path="/animal/:id" element={<AnimalDetails />} />
+
                     </Route>
                 </Routes>
             </Router>
