@@ -7,6 +7,7 @@ import ResetPassword  from './ResetPassword';
 import Main from './Main';
 import AddAnimls from './AddAnimls';
 import AnimalDetails from './AnimalDetails';
+import PaymentPage from './PaymentPage';
 
 
 
@@ -20,5 +21,6 @@ export {
     ResetPassword,
     Main,
     AddAnimls,
-    AnimalDetails
+    AnimalDetails,
+    PaymentPage
 }

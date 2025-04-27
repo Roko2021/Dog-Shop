@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AnimalsView, BidCreateView, AnimalMainShow, AnimalDetail
+from .views import AnimalsView, BidCreateView, AnimalMainShow, AnimalDetail, CategoryList
 # from .views import GoogleSignInView, GoogleAuthView, GithubSignInView
 
 urlpatterns = [
@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/bids/', BidCreateView.as_view(), name='bid-create'),
     path('main/', AnimalMainShow.as_view(), name='animall-main'),
     path('animals/<int:id>/', AnimalDetail.as_view(), name='animal-detail'), # إضافة هذا المسار
+    path('categories/', CategoryList.as_view(), name='category-list'), # إضافة هذا المسار
 
 
 

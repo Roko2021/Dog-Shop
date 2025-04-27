@@ -1,44 +1,108 @@
-import React, {useState , useEffect} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-// import { toast } from "react-toastify";
-// import React from "react"
+import { AuthContext } from "./AuthContext.jsx";
+ // استيراد AuthContext هنا
+// import { AuthProvider } from "./AuthContext.jsx"; // هذا السطر موجود بالفعل // استيراد AuthContext
 
-const Main= () =>{
+const Main = () => {
+    const auth = useContext(AuthContext);
+    console.log("AuthContext value in Main:", auth);
     const [animals, setAnimals] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+    const [loadingAnimals, setLoadingAnimals] = useState(true);
+    const [errorAnimals, setErrorAnimals] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [errorCategories, setErrorCategories] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [filteredAnimals, setFilteredAnimals] = useState([]);
+    const { isAuthenticated, user, login, logout } = useContext(AuthContext); // الوصول إلى حالة المصادقة
 
     useEffect(() => {
         const fetchAnimals = async () => {
-            setLoading(true);
+            setLoadingAnimals(true);
             try {
-                const response = await axios.get("http://127.0.0.1:8000/animal/main/"); // إزالة رأس Authorization
+                const response = await axios.get("http://127.0.0.1:8000/animal/main/");
                 setAnimals(response.data);
-                setLoading(false);
+                setLoadingAnimals(false);
             } catch (error) {
                 console.error("Error fetching animals:", error);
-                setError("Failed to load animals.");
-                setLoading(false);
+                setErrorAnimals("Failed to load animals.");
+                setLoadingAnimals(false);
+            }
+        };
+
+        const fetchCategories = async () => {
+            setLoadingCategories(true);
+            try {
+                const response = await axios.get("http://127.0.0.1:8000/animal/categories/");
+                setCategories(response.data);
+                setLoadingCategories(false);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                setErrorCategories("Failed to load categories.");
+                setLoadingCategories(false);
             }
         };
 
         fetchAnimals();
-    }, []); // إزالة jwt_access من قائمة الاعتماديات
+        fetchCategories();
+    }, []);
 
-    if (loading) {
-        return <p>Loading animals...</p>;
+    useEffect(() => {
+        if (selectedCategory === '') {
+            setFilteredAnimals(animals);
+        } else {
+            const filtered = animals.filter(animal => animal.category.id.toString() === selectedCategory);
+            setFilteredAnimals(filtered);
+        }
+    }, [animals, selectedCategory]);
+
+    const handleCategoryChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
+
+    if (loadingAnimals || loadingCategories) {
+        return <p>Loading data...</p>;
     }
 
-    if (error) {
-        return <p>{error}</p>;
+    if (errorAnimals || errorCategories) {
+        return <p>{errorAnimals || errorCategories}</p>;
     }
 
     return (
         <div>
             <h2>List of Animals</h2>
-            <div className="container" style={{ display: 'flex', flexDirection:"row", flexWrap: 'wrap', gap: '20px' }}>
-                {animals.map(animal => (
+
+            {isAuthenticated ? (
+                <div>
+                    {/* عرض عناصر مرئية للمستخدم المسجل */}
+                    <p>Welcome, {user ? user.username : 'User'}!</p> {/* مثال لعرض اسم المستخدم */}
+                    {/* ... عناصر أخرى خاصة بالمستخدم المسجل ... */}
+                    <button onClick={logout}>Logout</button> {/* زر تسجيل الخروج */}
+                </div>
+            ) : (
+                <div>
+                    {/* عرض عناصر مرئية للزائر غير المسجل */}
+                    <Link to="/signup">Sign Up</Link>
+                    <Link to="/signin">Sign In</Link>
+                    {/* ... عناصر أخرى خاصة بالزائر ... */}
+                </div>
+            )}
+
+            {/* باقي محتوى المكون (قائمة الحيوانات، الفلترة) */}
+            <div>
+                <label htmlFor="categoryFilter">Filter by Category: </label>
+                <select id="categoryFilter" value={selectedCategory} onChange={handleCategoryChange}>
+                    <option value="">All Categories</option>
+                    {categories.map(category => (
+                        <option key={category.id} value={category.id}>{category.categoryName}</option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="container" style={{ display: 'flex', flexDirection: "row", flexWrap: 'wrap', gap: '20px' }}>
+                {filteredAnimals.map(animal => (
                     <div key={animal.id} className="card" style={{ width: "20%" }}>
                         {animal.imageFile && <img className="card-img-top" src={`http://localhost:8000${animal.imageFile}`} alt={animal.title} style={{ maxWidth: '200px' }} />}
                         <div className="card-body">
@@ -48,7 +112,7 @@ const Main= () =>{
                             </p>
                             <p>Price: {animal.price}</p>
                             <p>Category: {animal.category.categoryName}</p>
-                            <Link to={`/animal/${animal.id}`} className="btn btn-primary stretched-link">See Details</Link> {/* استخدام Link للانتقال */}
+                            <Link to={`/animal/${animal.id}`} className="btn btn-primary stretched-link">See Details</Link>
                         </div>
                     </div>
                 ))}
@@ -56,5 +120,5 @@ const Main= () =>{
         </div>
     );
 };
-export default Main
 
+export default Main;
