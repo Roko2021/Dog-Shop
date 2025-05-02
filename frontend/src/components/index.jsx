@@ -8,6 +8,7 @@ import Main from './Main';
 import AddAnimls from './AddAnimls';
 import AnimalDetails from './AnimalDetails';
 import PaymentPage from './PaymentPage';
+import MyAnimals from './MyAnimals';
 
 
 
@@ -22,5 +23,6 @@ export {
     Main,
     AddAnimls,
     AnimalDetails,
-    PaymentPage
+    PaymentPage,
+    MyAnimals
 }

@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'; // استيراد toast
 export default function Profile() {
     const navigate = useNavigate();
     
-    const jwt_access = JSON.parse(localStorage.getItem('access'));
+    const jwt_access = localStorage.getItem('access');
     const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
 
     // حالة لتخزين بيانات المستخدم المسترجعة من الـ API

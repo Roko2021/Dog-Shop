@@ -76,3 +76,13 @@ button:focus-visible {
   justify-content: space-between;
   align-items: flex-start;
 }
+
+.Layout-Container{
+  background-color: black;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  align-content: stretch;
+  flex-wrap: nowrap; 
+}

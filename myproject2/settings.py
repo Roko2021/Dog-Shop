@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "accounts",
     "social_accounts",
     "corsheaders",
+    "rest_framework.authtoken",
 
 ]
 
@@ -102,13 +103,19 @@ DATABASES = {
 AUTH_USER_MODEL='accounts.User'
 
 REST_FRAMEWORK = {
-    
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-    
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-    
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # قد تحتاج إلى تغيير هذا لاحقًا
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser'
+    ],
 }
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),

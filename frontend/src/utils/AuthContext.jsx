@@ -1,44 +1,70 @@
 import React, { createContext, useState, useEffect } from 'react';
 
-export const AuthContext = createContext({
+const defaultAuthContext = {
+  isAuthenticated: false,
+  user: null,
+  loading: true,
+  login: () => console.warn('login function not implemented'),
+  logout: () => console.warn('logout function not implemented')
+};
+
+export const AuthContext = createContext(defaultAuthContext);
+
+export const AuthProvider = ({ children }) => {
+  const [authState, setAuthState] = useState({
     isAuthenticated: false,
     user: null,
-    login: () => {},
-    logout: () => {}
+    loading: true
   });
-export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // حالة تسجيل الدخول
-    const [user, setUser] = useState(null); // معلومات المستخدم (اختياري)
 
-    useEffect(() => {
-        // هنا يمكنك إضافة منطق للتحقق من وجود رمز مميز (token) محفوظ
-        // في Local Storage أو Cookies عند تحميل التطبيق.
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            // قم بفك تشفير الرمز المميز أو استدعاء API للتحقق من صحته
-            // وتعيين حالة تسجيل الدخول والمستخدم إذا كان صالحًا.
-            setIsAuthenticated(true);
-            // setUser({...});
-        }
-    }, []);
+  useEffect(() => {
+    // قراءة بيانات المستخدم من localStorage عند التحميل
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('access');
 
-    const login = (userData) => {
-        setIsAuthenticated(true);
-        setUser(userData);
-        // حفظ الرمز المميز (token) في Local Storage أو Cookies
-        localStorage.setItem('authToken', 'your_auth_token'); // استبدل بآلية حفظ الرمز الحقيقية
-    };
+    if (storedUser && storedToken) {
+      try {
+        setAuthState({
+          isAuthenticated: true,
+          user: JSON.parse(storedUser),
+          loading: false
+        });
+      } catch (error) {
+        console.error('Failed to parse user:', error);
+        logout();
+      }
+    } else {
+      setAuthState(prev => ({ ...prev, loading: false }));
+    }
+  }, []);
 
-    const logout = () => {
-        setIsAuthenticated(false);
-        setUser(null);
-        // إزالة الرمز المميز (token) من Local Storage أو Cookies
-        localStorage.removeItem('authToken');
-    };
+  const login = (userData, accessToken, refreshToken) => {
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('access', accessToken);
+    localStorage.setItem('refresh', refreshToken);
+    setAuthState({
+      isAuthenticated: true,
+      user: userData,
+      loading: false
+    });
+    console.log('AuthProvider: Login successful', { isAuthenticated: true, user: userData });
+  };
 
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  const logout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    setAuthState({
+      isAuthenticated: false,
+      user: null,
+      loading: false
+    });
+    console.log('AuthProvider: Logout successful');
+  };
+
+  return (
+    <AuthContext.Provider value={{ ...authState, login, logout, setAuthState }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };

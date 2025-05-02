@@ -56,3 +56,11 @@ class AnimalMainSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Animals
 #         fields = ['title', 'description', 'imageUrl', 'price', 'category']
+
+
+
+class AnimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Animals
+        fields = ['id', 'title', 'description', 'price', 'imageFile', 'category']  # عدل الحقول حسب الموديل
+        depth = 1  # إذا أردت تضمين تفاصيل الفئة (category)

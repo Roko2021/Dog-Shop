@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
-from .serializers import AnimalsSerializer, CategorySerializer, BidSerializer, AnimalMainSerializer
+from .serializers import AnimalsSerializer, CategorySerializer, BidSerializer, AnimalMainSerializer, AnimalSerializer
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
@@ -68,3 +68,14 @@ class AnimalDetail(RetrieveAPIView):
     queryset = Animals.objects.all()
     serializer_class = AnimalMainSerializer
     lookup_field = 'id'  # استخدام الـ id كمعرف للبحث
+
+
+
+
+class MyAnimalsListView(generics.ListAPIView):
+    serializer_class = AnimalSerializer
+    permission_classes = [IsAuthenticated]  # المستخدم يجب أن يكون مُسجّل الدخول
+
+    def get_queryset(self):
+        # يعيد فقط الحيوانات التي يملكها المستخدم الحالي
+        return Animals.objects.filter(owner=self.request.user)

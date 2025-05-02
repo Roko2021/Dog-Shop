@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 
 const AddAnimals = () => {
-  const jwt_access = JSON.parse(localStorage.getItem('access'));
+  const jwt_access = localStorage.getItem('access')
 
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
