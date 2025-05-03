@@ -4,8 +4,9 @@ from .utils import Google,register_social_user
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed,ValidationError
 
+
 class GoogleSignInSerializer(serializers.Serializer):
-    access_token = serializers.CharField(min_length=6, write_only=True)  # استقبال الرمز المميز فقط
+    access_token = serializers.CharField(min_length=6, write_only=True)
 
     def validate(self, data):
         access_token = data.get('access_token')
@@ -13,9 +14,11 @@ class GoogleSignInSerializer(serializers.Serializer):
             google_user_data = Google.validate(access_token)
             return {
                 'email': google_user_data.get('email'),
-                'first_name': google_user_data.get('given_name'),
-                'last_name': google_user_data.get('family_name')
+                'first_name': google_user_data.get('first_name'), # احصل على الاسم الأول
+                'last_name': google_user_data.get('last_name')   # احصل على الاسم الأخير
             }
+        except AuthenticationFailed as e:
+            raise serializers.ValidationError(str(e))
         except Exception as e:
             raise serializers.ValidationError('Invalid Google token.')
 

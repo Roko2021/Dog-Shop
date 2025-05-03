@@ -23,7 +23,7 @@ const AddAnimals = () => {
     if (!jwt_access) return;
 
     setLoading(true);
-    axios.get("http://localhost:8000/animal/addadnimals/", {
+    axios.get("http://localhost:8000/animal/categories/", {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${jwt_access}`
@@ -62,6 +62,10 @@ const AddAnimals = () => {
       toast.error("You must to choose Image");
       return;
     }
+    if (!formData.category) {
+      toast.error("You must select a category");
+      return;
+    }
 
     setLoading(true); // تعيين حالة التحميل عند الإرسال
 
@@ -71,7 +75,8 @@ const AddAnimals = () => {
       animalFormData.append('description', formData.description);
       animalFormData.append('imageFile', formData.imageFile);
       animalFormData.append('price', formData.price);
-      animalFormData.append('category', formData.category);
+      animalFormData.append('category', parseInt(formData.category));
+      // animalFormData.append('category', formData.category);
 
       const res = await axios.post(
         "http://localhost:8000/animal/addadnimals/",
@@ -99,6 +104,14 @@ const AddAnimals = () => {
         setLoading(false); // إعادة تعيين حالة التحميل بعد النجاح
       }
     } catch (error) {
+
+      console.error("Error details:", {
+        request: error.config.data,
+        response: error.response?.data
+      });
+
+      toast.error(error.response?.data?.category?.[0] || "Error adding animal");
+      
       console.error("Error:", error);
       toast.error(error.response?.data?.message || "there error when you send");
       setLoading(false); // إعادة تعيين حالة التحميل حتى في حالة الخطأ

@@ -16,13 +16,19 @@ const Main = () => {
   const [filteredAnimals, setFilteredAnimals] = useState([]);
 
   useEffect(() => {
+    console.log("Categories state:", categories); // أضف هذا لمشاهدة البيانات
     const fetchAnimals = async () => {
       setLoadingAnimals(true);
       try {
         const response = await axios.get("http://127.0.0.1:8000/animal/main/");
+        console.log("Categories response:", response); // أضف هذا السطر
+
         setAnimals(response.data);
+        
         setLoadingAnimals(false);
       } catch (error) {
+        console.error("Error details:", error.response); // أضف هذا السطر
+
         console.error("Error fetching animals:", error);
         setErrorAnimals("Failed to load animals.");
         setLoadingAnimals(false);
@@ -98,13 +104,13 @@ const Main = () => {
       <div className="container" style={{ display: 'flex', flexDirection: "row", flexWrap: 'wrap', gap: '20px' }}>
         {filteredAnimals.map(animal => (
           <div key={animal.id} className="card" style={{ width: "20%" }}>
-            {animal.imageFile && <img className="card-img-top" src={`http://localhost:8000${animal.imageFile}`} alt={animal.title} style={{ maxWidth: '200px' }} />}
+            {animal.imageFile && <img className="card-img-top" src={`${animal.imageFile}`} alt={animal.title} style={{ maxWidth: '200px' }} />}
             <div className="card-body">
               <h4 className="card-title">{animal.title}</h4>
               <p className="card-text">
                 {animal.description.length > 50 ? `${animal.description.substring(0, 150)}...` : animal.description}
               </p>
-              <p>Price: {animal.price}</p>
+              <p>Price: {animal.price} $</p>
               <p>Category: {animal.category.categoryName}</p>
               <Link to={`/animal/${animal.id}`} className="btn btn-primary stretched-link">See Details</Link>
             </div>

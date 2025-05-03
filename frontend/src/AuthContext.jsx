@@ -43,12 +43,12 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('access', accessToken);
     localStorage.setItem('refresh', refreshToken);
     setAuthState({
-      isAuthenticated: true,
-      user: userData,
-      loading: false
+        isAuthenticated: true,
+        user: userData,
+        loading: false
     });
-    console.log('AuthProvider: Login successful', { isAuthenticated: true, user: userData });
-  };
+    console.log('AuthProvider: Login successful', { isAuthenticated: true, user: userData, accessToken, refreshToken });
+};
 
   const logout = () => {
     localStorage.removeItem('user');

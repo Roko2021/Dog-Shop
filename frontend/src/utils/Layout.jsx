@@ -63,11 +63,11 @@ const Layout = () => {
                 <Link to="/" style={{ color: "white" }}>Main</Link>
               </div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ color: 'white', margin: '0 10px', display: 'flex', alignItems: 'center' }}>
+              <span style={{ color: 'white', margin: '0 10px', display: 'flex', alignItems: 'center' }}>
                   Welcome, <Link to="/dashboard" style={{ color: 'white', marginLeft: 5 }}>
-                    {user?.names || user?.username || 'User'}
+                      {user?.firstName} {user?.lastName} ({user?.email})
                   </Link>
-                </span>
+              </span>
                 <Link to="/my-animals">
                   <img style={{ margin: '0 10px', width: "40px" }} src="/images/add_your_pets.png" alt="icon" />
                 </Link>

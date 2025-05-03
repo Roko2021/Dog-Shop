@@ -55,31 +55,76 @@ def create_user_from_google(id_info):
         raise
 
 # عرض المصادقة عبر Google باستخدام APIView
+
+import logging
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import GoogleSignInSerializer
+from .utils import register_social_user
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+logger = logging.getLogger(__name__)
+
+
 class GoogleSignInView(APIView):
+    serializer_class = GoogleSignInSerializer
+    permission_classes = []
+
     def post(self, request, *args, **kwargs):
-        # print("Received request data:", request.data)
-        token = request.data.get('access_token')
-        
-        if not token:
-            return Response({"error": "Missing access token"}, status=400)
+        logger.info("GoogleSignInView.post called")
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        logger.info(f"Validated data: {data}")
+        try:
+            user_data = register_social_user(
+                provider='google',
+                email=data.get('email'),
+                google_first_name=data.get('first_name'), # استخدم الاسم الذي تم إرجاعه من المسلسل
+                google_last_name=data.get('last_name')   # استخدم الاسم الذي تم إرجاعه من المسلسل
+            )
+            logger.info(f"register_social_user returned: {user_data}")
+            if user_data:
+                user = User.objects.get(email=user_data['email'])
+                refresh = RefreshToken.for_user(user)
+                response_data = {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'full_name': user.get_full_name(),
+                    'access_token': str(refresh.access_token),
+                    'refresh_token': str(refresh),
+                }
+                logger.info(f"Returning response: {response_data}")
+                return Response(response_data, status=status.HTTP_200_OK)
+            else:
+                logger.error("register_social_user failed")
+                return Response({'error': 'Failed to register or login user.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.exception(f"Error in GoogleSignInView.post: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # تحقق من التوكن
-        if not verify_google_token(token):
-            return Response({"error": "Invalid or expired token"}, status=400)
 
-         # تحقق من التوكن
-        user_data = verify_google_token(token)
-        if not user_data:
-            return Response({"error": "Invalid or expired token"}, status=400)
 
-        # استدعاء الدالة لإنشاء المستخدم
-        user = create_user_from_google(user_data)
-        
-        return Response({"message": f"تم تسجيل الدخول بنجاح! مرحباً {user.email}"})
-        
-        # verify_google_token(token)
-        return Response({"message": "تم تسجيل الدخول بنجاح!"})
+# class GoogleAuthView(APIView): # تم التعليق عليه لتجنب التكرار
+#     def post(self, request, *args, **kwargs):
+#         token = request.data.get('access_token')
+#         if not token:
+#             return Response({"error": "Missing access token"}, status=400)
+#
+#         try:
+#             user_data = verify_google_token(token)
+#             return Response({"message": "تم تسجيل الدخول بنجاح!"})
+#         except Exception as e:
+#             return Response({"error": str(e)}, status=400)
 
+
+# حذف الفئات الأخرى التي تتعامل مع تسجيل الدخول بجوجل لتجنب التكرار
+# class GoogleAuthView(APIView):
+#     pass
 
 # عرض تسجيل الدخول عبر Google باستخدام GenericAPIView
 class GoogleAuthView(APIView):

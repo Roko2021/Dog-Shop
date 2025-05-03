@@ -47,7 +47,7 @@ const AnimalDetails = () => {
                 </div>             
             </div>
             <p>Description: {animal.description}</p>
-            <p>Price: {animal.price}</p>
+            <p>Price: {animal.price} $</p>
             <p>Category: {animal.category.categoryName}</p>
             {/* يمكنك عرض المزيد من التفاصيل هنا */}
         </div>

@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+// # frontend/src/pages/Signup.jsx
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import axios from "axios";
-// import axiosInstance from "../utils/axiosinstance";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-// import { jwtDecode } from 'jwt-decode';
+import { AuthContext } from "../AuthContext"; // استيراد AuthContext
 
 const Signup = () => {
     const navigate = useNavigate();
-    // const [searchParams] = useSearchParams();
-
+    const { login } = useContext(AuthContext); // استيراد دالة login من AuthContext
     const [formData, setFormData] = useState({
         email: "",
         first_name: "",
@@ -16,7 +15,6 @@ const Signup = () => {
         password: "",
         password2: "",
     });
-
     const [error, setError] = useState("");
 
     // 🔐 تسجيل الدخول باستخدام Google
@@ -42,24 +40,30 @@ const Signup = () => {
             }
 
             // أرسل الـ access token إلى السيرفر
-            const serverRes = await axios.post("http://localhost:8000/api/v1/auth/google/", {
-                access_token: payload,
+            const serverRes = await axios.post("http://localhost:8000/api/v1/social/google/", {
+                access_token: payload, // payload هو response.credential
             });
 
-            if (serverRes.status === 200) {
-                console.log("تم تسجيل الدخول بنجاح");
-                toast.success("تم تسجيل الدخول بنجاح");
 
-                const user = {
-                    email: serverRes.data.email,
-                    names: serverRes.data.full_name,
+            if (serverRes.status === 200) {
+                console.log("تم تسجيل الدخول بنجاح", serverRes.data); // طباعة بيانات الاستجابة
+
+                const { email, first_name, last_name, access_token, refresh_token } = serverRes.data;
+
+                const userData = {
+                    email: email,
+                    names: `${first_name} ${serverRes.data.last_name}`, // استخدام serverRes.data.last_name
+                    firstName: first_name,
+                    lastName: serverRes.data.last_name, // استخدام serverRes.data.last_name
                 };
 
-                localStorage.setItem("user", JSON.stringify(user));
-                localStorage.setItem("access", serverRes.data.access_token);
-                localStorage.setItem("refresh", serverRes.data.refresh_token);
+                login(userData, access_token, refresh_token); // استدعاء دالة login مع userData
 
-                navigate("/dashboard");
+                localStorage.setItem("user", JSON.stringify(userData));
+                localStorage.setItem("access", access_token);
+                localStorage.setItem("refresh", refresh_token);
+
+                navigate("/");
             } else {
                 toast.error("حدث خطأ أثناء تسجيل الدخول");
             }
@@ -67,7 +71,7 @@ const Signup = () => {
             console.error("خطأ في تسجيل الدخول باستخدام Google:", err);
             toast.error("فشل التسجيل باستخدام جوجل");
         }
-    }, [navigate]);
+    }, [navigate, login]); // إضافة login إلى قائمة الاعتماديات
 
     // 🌐 تهيئة زر Google
     useEffect(() => {
@@ -121,63 +125,6 @@ const Signup = () => {
             }
         }
     };
-
-    // const handleSignInWithGithub = () => {
-    //     window.location.assign(`https://github.com/login/oauth/authorize?client_id=Ov23libKLQO4Vlu13eJp`);
-    // };
-
-    // const sendCodeToBackend = useCallback(async () => {
-    //     const code = searchParams.get('code');
-    //     if (code) {
-    //         try {
-    //             const response = await axiosInstance.post("/auth/github/", { 'code': code });
-    //             const result = response.data;
-    //             console.log("Response from server:", result);
-
-    //             if (response.status === 200) {
-    //                 if (result.access_token && result.refresh_token) {
-    //                     // Check if the token is a valid JWT before decoding
-    //                     const tokenFormatRegex = /^([a-zA-Z0-9_-]+\.){2}[a-zA-Z0-9_-]+$/;
-    //                     if (tokenFormatRegex.test(result.access_token)) {
-    //                         try {
-    //                             const decoded = jwtDecode(result.access_token);
-    //                             const user = {
-    //                                 'email': decoded.email,
-    //                                 'names': decoded.name
-    //                             };
-    //                             localStorage.setItem('access', result.access_token);
-    //                             localStorage.setItem('refresh', result.refresh_token);
-    //                             localStorage.setItem('user', JSON.stringify(user));
-    //                             navigate('/dashboard');
-    //                             toast.success('Login Successful');
-    //                         } catch (decodeError) {
-    //                             console.error("Error decoding JWT:", decodeError);
-    //                             toast.error('Failed to login: Invalid token format');
-    //                         }
-
-    //                     }
-    //                     else {
-    //                         console.error("Invalid access token format from server", result.access_token);
-    //                         toast.error('Failed to login: Invalid token format from server');
-    //                     }
-    //                 } else {
-    //                     console.error("Access token or refresh token is missing in the response");
-    //                     toast.error('Failed to login with GitHub: Missing tokens');
-    //                 }
-    //             } else {
-    //                 console.error("Unexpected response status:", response.status);
-    //                 toast.error(`Failed to login with GitHub: Unexpected status ${response.status}`);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error during GitHub login:", error);
-    //             toast.error('Failed to login with GitHub');
-    //         }
-    //     }
-    // }, [navigate, searchParams]);
-
-    // useEffect(() => {
-    //     sendCodeToBackend();
-    // }, [sendCodeToBackend]);
 
     return (
         <div className="form-container">
@@ -237,13 +184,6 @@ const Signup = () => {
                     </div>
                     <input type="submit" value="Submit" className="submitButton" />
                 </form>
-
-                {/* <h3 className="text-option">Or</h3> */}
-
-                {/* <div className="githubContainer">
-                    <button onClick={handleSignInWithGithub}>Sign up with GitHub</button>
-                </div> */}
-
                 <div className="googleContainer" id="signInDiv"></div>
             </div>
         </div>
